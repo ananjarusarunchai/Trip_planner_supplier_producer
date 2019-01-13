@@ -1,0 +1,99 @@
+service: trip-planner-supplier-producer # NOTE: update this with your service name
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  region: us-east-2
+  environments:
+    HotelQueue: Trip-planner-Hotels-SQS
+    HoTelTable: TripPlannerHotels
+  iamRoleStatements:
+    - Effect: Allow
+      Action: 
+        - "sqs:SendMessage"
+        - "sqs:GetQueueUrl"
+      Resource: "arn:aws:sqs:${self:provider.region}:xxxxxxxx:${self:provider.environments.HotelQueue}"
+    - Effect: Allow
+      Action:
+        - "sqs:ListQueues"
+      Resource: "arn:aws:sqs:${self:provider.region}:xxxxxxxx:*"
+  memorySize: 512
+  timeout: 10
+  deploymentBucket: anan-java-api-bucket
+  stage: production
+
+package:
+ include:
+   - src/**
+ exclude:
+   - node_modules/**
+   - '!node_modules/node-fetch/**'
+   - package/**
+   - tmp/**
+   - .git/**
+   - README.md
+   - package-lock.json
+#  excludeDevDependencies: false
+#  artifact: 
+#    - ./package/my-service.zip
+    # individually: true
+
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-include-dependencies
+  - serverless-webpack
+  - serverless-plugin-aws-alerts
+  # - serverless-plugin-canary-deployments
+  # - serverless-mocha-plugin
+  # - serverless-babel-plugin
+
+custom:
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    includeModules:
+      forceExclude:
+        - aws-sdk  
+    packager: 'npm'
+  serverless-offline:
+    babelOptions:
+      presets: ["es2015",  "stage-2"]
+  deploymentSettings:
+    stages:
+      - dev
+      - production
+  # serverless-mocha-plugin:
+  #  testTemplate: tests/myTest.js
+
+# package:
+#   individually: true
+ 
+functions:
+  sender: 
+    handler: producer.handler
+    name: tripplanner-producer-service
+    events:
+     - http:
+        path: sender/message
+        method: post
+
+resources:
+  Resources:
+    TripPlannerHotelsSQS:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:provider.environments.HotelQueue}
+        VisibilityTimeout: 30
+        MessageRetentionPeriod: 1209600 # 14 days in seconds
+        RedrivePolicy:
+          deadLetterTargetArn:
+            "Fn::GetAtt":
+              - TripPlannerHotelsDeadLetterQueue
+              - Arn
+          maxReceiveCount: 1
+    TripPlannerHotelsDeadLetterQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "TripPlannerHotelsDeadLetterQueue"
+        MessageRetentionPeriod: 1209600 # 14 days in seconds
+

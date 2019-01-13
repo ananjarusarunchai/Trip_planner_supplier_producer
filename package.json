@@ -1,0 +1,60 @@
+{
+  "name": "trip_planner_userplan_service",
+  "version": "0.0.1",
+  "description": "*How to Run Locally*\r 1) Add plugins:\r   - serverless-offline\r 2) serverless offline start or sls offline start.",
+  "main": "handler.js",
+  "scripts": {
+    "new-func": "sls create function -f functionName --handler handler",
+    "new-test": "sls create test -f functionName",
+    "invoke-func": "serverless invoke local --function functionName",
+    "test-func": "sls invoke test [--stage stage] [--region region] [-f function1]",
+    "dev": "sls offline start --location ./ --port 3900",
+    "deploy": "serverless deploy --stage production --region us-east-2",
+    "deploy-func": "serverless deploy function --function ${{functionname}}",
+    "deploy-package": "serverless deploy --region us-east-2 --package package",
+    "package": "serverless package --package ./package",
+    "package-all": "serverless package",
+    "test": "./node_modules/.bin/mocha --compilers js:babel-core/register ./test/**/*spec.js"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.293.0",
+    "babel-runtime": "^6.26.0",
+    "bluebird": "^3.5.1",
+    "lodash": "^4.17.10"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.1.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-plugin-dynamic-import-node": "^2.1.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "chai": "^4.2.0",
+    "install": "^0.12.1",
+    "lodash-webpack-plugin": "^0.11.5",
+    "mocha": "^5.2.0",
+    "npm": "^6.4.1",
+    "serverless": "^1.30.0",
+    "serverless-babel-plugin": "^0.2.0",
+    "serverless-mocha-plugin": "^1.8.3",
+    "serverless-offline": "^3.25.7",
+    "serverless-plugin-aws-alerts": "^1.2.4",
+    "serverless-plugin-canary-deployments": "^0.4.0",
+    "serverless-plugin-include-dependencies": "^3.1.1",
+    "serverless-webpack": "^5.2.0",
+    "webpack": "^4.16.5",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "author": "",
+  "license": "ISC",
+  "babel": {
+    "presets": [
+      "stage-2",
+      "env"
+    ]
+  }
+}
